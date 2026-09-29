@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台北兒童新樂園三天兩夜</title>
+    <!-- 引入日式圓潤字體 Zen Maru Gothic -->
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- 引入 FontAwesome 圖示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --fuji-blue: #2B4C7E;
+            --snow-white: #FFFFFF;
+            --warm-gray: #F4F3F0;
+            --card-bg: #FFFFFF;
+            --text-main: #333333;
+            --text-sub: #7A8B9E;
+            --tag-food: #FF6B6B;
+            --tag-buy: #2A9D8F;
+            --tag-photo: #F4A261;
+            --tag-act: #E76F51;
+            --tag-spot: #2B4C7E;
+            --tag-hotel: #6A4C93;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+
+        body {
+            background-color: var(--warm-gray);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 手機外框模擬器 */
+        .phone-container {
+            width: 100%;
+            max-width: 414px;
+            height: 100vh;
+            max-height: 896px;
+            background-color: var(--snow-white);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 415px) {
+            .phone-container {
+                height: 844px;
+                border-radius: 40px;
+                border: 8px solid #333;
+            }
+        }
+
+        /* Header 區域 */
+        .app-header {
+            background-color: var(--fuji-blue);
+            color: var(--snow-white);
+            padding: 24px 20px 18px 20px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: 0 4px 12px rgba(43, 76, 126, 0.15);
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            opacity: 0.85;
+            letter-spacing: 0.5px;
+        }
+
+        /* 內容滾動區 */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            padding-bottom: 100px;
+            background: linear-gradient(180deg, #F8F9FA 0%, var(--warm-gray) 100%);
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 每日選擇切換列 (Day Selector) */
+        .day-selector {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            background: #E8EEF5;
+            padding: 4px;
+            border-radius: 16px;
+        }
+
+        .day-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 8px 4px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-sub);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .day-btn.active {
+            background: var(--snow-white);
+            color: var(--fuji-blue);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .day-section {
+            display: none;
+        }
+
+        .day-section.active {
+            display: block;
+        }
+
+        /* 日期+地點總覽卡 */
+        .daily-meta-card {
+            background: linear-gradient(135deg, #2B4C7E, #4A7BBA);
+            color: white;
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(43,76,126,0.2);
+        }
+
+        .daily-meta-info h2 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .daily-meta-info p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .daily-meta-icon {
+            font-size: 26px;
+            background: rgba(255,255,255,0.2);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        /* 時間軸樣式 (Timeline) */
+        .timeline-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--fuji-blue);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .timeline-list {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .timeline-list::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 6px;
+            bottom: 6px;
+            width: 2px;
+            background-color: #E2E8F0;
+        }
+
+        .timeline-node {
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .timeline-node:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -17px;
+            top: 3px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--fuji-blue);
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #E2E8F0;
+        }
+
+        .timeline-time-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--fuji-blue);
+            background-color: #E8EEF5;
+            padding: 2px 6px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 2px;
+        }
+
+        .timeline-text {
+            font-size: 12px;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        /* 景點卡片樣式 (Spot Card) */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .category-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 8px;
+            color: white;
+        }
+        .cat-hotel { background-color: var(--tag-hotel); }
+        .cat-spot { background-color: var(--tag-spot); }
+        .cat-food { background-color: var(--tag-food); }
+        .cat-act { background-color: var(--tag-act); }
+        .cat-shopping { background-color: var(--tag-buy); }
+
+        .highlight-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            color: white;
+        }
+        .badge-eat { background-color: #FF6B6B; }
+        .badge-buy { background-color: #2A9D8F; }
+        .badge-photo { background-color: #E9C46A; color: #333; }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--fuji-blue);
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .info-box {
+            background-color: #F8F9FA;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            border-left: 3px solid var(--fuji-blue);
+        }
+
+        .info-box i {
+            color: var(--fuji-blue);
+            margin-top: 2px;
+        }
+
+        .photo-tip-box {
+            background-color: #FFF9E6;
+            border-left-color: #FFD166;
+        }
+        .photo-tip-box i {
+            color: #D4A373;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #F0F0F0;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .map-btn {
+            background-color: #E8EEF5;
+            color: var(--fuji-blue);
+        }
+
+        .upload-btn {
+            background-color: #F0F7F4;
+            color: #2A9D8F;
+        }
+
+        .action-btn:active {
+            opacity: 0.8;
+        }
+
+        .photo-preview-container {
+            margin-top: 10px;
+            display: none;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            max-height: 160px;
+            background: #000;
+        }
+
+        .photo-preview-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .weather-prompt-banner {
+            background-color: #EAF4F4;
+            color: #2A9D8F;
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .weather-prompt-banner i {
+            font-size: 16px;
+        }
+
+        /* 其它分頁與底部列 */
+        .weather-banner {
+            background: linear-gradient(135deg, #4A7BBA, var(--fuji-blue));
+            color: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .weather-info h3 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .weather-info p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .weather-icon {
+            font-size: 36px;
+            color: #FFD166;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            z-index: 100;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-sub);
+            font-size: 12px;
+            cursor: pointer;
+            padding: 6px 16px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+
+        .nav-item.active {
+            color: var(--fuji-blue);
+            background-color: #E8EEF5;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-container">
+    <!-- Header 區塊 -->
+    <header class="app-header">
+        <div class="header-title">
+            <i class="fa-solid fa-cloud-sun"></i> 台北兒童新樂園特輯
+        </div>
+        <div class="header-subtitle">
+            <span>📅 三天兩夜童趣自由行 (潭子/豐原出發)</span>
+        </div>
+    </header>
+
+    <!-- 內容頁籤切換區 -->
+    <div class="app-content">
+
+        <!-- 1. 行程頁籤 -->
+        <div id="tab-itinerary" class="tab-pane active">
+            
+            <!-- 每日選擇切換列 -->
+            <div class="day-selector">
+                <button class="day-btn active" onclick="switchDay('day1', this)">Day 1 樂園與住宿</button>
+                <button class="day-btn" onclick="switchDay('day2', this)">Day 2 科教館與北投</button>
+                <button class="day-btn" onclick="switchDay('day3', this)">Day 3 大稻埕賦歸</button>
+            </div>
+
+            <!-- ================= DAY 1 (去程時間軸 + 樂園 + 拾光行旅) ================= -->
+            <div id="section-day1" class="day-section active">
+                <div class="daily-meta-card">
+                    <div class="daily-meta-info">
+                        <h2>DAY 1 · 啟程、樂園與拾光行旅</h2>
+                        <p>📍 地點：台中出發 ➔ 兒童新樂園 ➔ 大同區</p>
+                    </div>
+                    <div class="daily-meta-icon">
+                        <i class="fa-solid fa-train"></i>
+                    </div>
+                </div>
+
+                <!-- 去程時間軸卡片 -->
+                <div class="timeline-card">
+                    <div class="timeline-title">
+                        <i class="fa-solid fa-clock"></i> <span>去程鐵道時刻軸</span>
+                    </div>
+                    <div class="timeline-list">
+                        <div class="timeline-node">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time-badge">06:29 - 06:35 / 06:50 - 06:56</div>
+                            <div class="timeline-text">搭乘台鐵區間車（<strong>2120班次</strong> 06:29潭子發車 或 <strong>2122班次</strong> 06:50潭子發車）至豐原站。</div>
+                        </div>
+                        <div class="timeline-node">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time-badge">07:02 - 08:43</div>
+                            <div class="timeline-text">於豐原站轉乘普悠瑪 <strong>5280班次</strong>（豐原 07:02 ➔ 台北 07:43 直達）。</div>
+                        </div>
+                        <div class="timeline-node">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time-badge">09:00 以後</div>
+                            <div class="timeline-text">抵達台北，搭乘捷運展開歡樂旅程！</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 景點卡片 1：兒童新樂園 -->
+                <div class="card">
+                    <div class="card-header-row">
+                        <span class="category-tag cat-act">活動</span>
+                        <span class="highlight-badge badge-photo">必玩必拍</span>
+                    </div>
+                    <div class="card-title">台北兒童新樂園 (全日暢玩)</div>
+                    <div class="card-desc">台北唯一的平價親子樂園，擁有旋轉木馬、水果摩天輪、銀河號等 13 項大型遊樂設施。</div>
+                    
+                    <div class="info-box">
+                        <i class="fa-solid fa-train-subway"></i>
+                        <div><strong>捷運資訊：</strong>搭乘捷運至「士林站」轉乘兒童新樂園接駁專車（紅30、620等）。</div>
+                    </div>
+                    <div class="info-box photo-tip-box">
+                        <i class="fa-solid fa-camera"></i>
+                        <div><strong>拍照小技巧：</strong>在「水果摩天輪」下方利用低角度向上仰拍，捕捉色彩繽紛的車廂與藍天。</div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="https://maps.google.com/?q=台北兒童新樂園" target="_blank" class="action-btn map-btn">
+                            <i class="fa-solid fa-location-dot"></i> Google 導航
+                        </a>
+                        <label class="action-btn upload-btn">
+                            <i class="fa-solid fa-image"></i> 上傳旅記
+                            <input type="file" accept="image/*" onchange="handleImageUpload(event, this)" style="display:none;">
+                        </label>
+                    </div>
+                    <div class="photo-preview-container"></div>
+                </div>
+
+                <!-- 景點卡片 2：Lumos Inn 拾光行旅 (住宿) -->
+                <div class="card">
+                    <div class="card-header-row">
+                        <span class="category-tag cat-hotel">酒店</span>
+                        <span class="highlight-badge badge-buy">溫馨住宿</span>
+                    </div>
+                    <div class="card-title">Lumos Inn 拾光行旅</div>
+                    <div class="card-desc">位於大同區的質感旅宿，鄰近延三夜市與迪化街商圈，環境舒適溫馨，極具文青風格。</div>
+                    
+                    <div class="info-box">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div><strong>地址：</strong>臺北市大同區南芳里延平北路二段255號2樓</div>
+                    </div>
+                    <div class="info-box">
+                        <i class="fa-solid fa-train-subway"></i>
+                        <div><strong>捷運資訊（士林站出發）：</strong>從「士林站」搭乘淡水信義線至「民權西路站」，站內轉乘中和新蘆線至「大橋頭站」，由 1 號出口出站過馬路步行約 1 分鐘即達。</div>
+                    </div>
+                    <div class="info-box photo-tip-box">
+                        <i class="fa-solid fa-camera"></i>
+                        <div><strong>拍照小技巧：</strong>房間內暖色調的燈光與木質調裝潢，適合拍攝溫馨的室內旅宿紀念照。</div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="https://maps.google.com/?q=臺北市大同區延平北路二段255號2樓" target="_blank" class="action-btn map-btn">
+                            <i class="fa-solid fa-location-dot"></i> Google 導航
+                        </a>
+                        <label class="action-btn upload-btn">
+                            <i class="fa-solid fa-image"></i> 上傳旅記
+                            <input type="file" accept="image/*" onchange="handleImageUpload(event, this)" style="display:none;">
+                        </label>
+                    </div>
+                    <div class="photo-preview-container"></div>
+                </div>
+
+                <!-- 每日天氣提示 -->
+                <div class="weather-prompt-banner">
+                    <i class="fa-solid fa-sun"></i>
+                    <span><strong>Day 1 天氣提示：</strong>晴朗炎熱，樂園戶外活動多，請注意防曬並隨時補充水分。</span>
+                </div>
+            </div>
+
+            <!-- ================= DAY 2 (科教館、天文館、北投徒步泡腳、雙夜市) ================= -->
+            <div id="section-day2" class="day-section">
+                <div class="daily-meta-card">
+                    <div class="daily-meta-info">
+                        <h2>DAY 2 · 科學探索、北投泡腳與雙夜市</h2>
+                        <p>📍 地點：士林科教館 ➔ 天文館 ➔ 北投 ➔ 夜市</p>
+                    </div>
+                    <div class="daily-meta-icon">
+                        <i class="fa-solid fa-flask"></i>
+                    </div>
+                </div>
+                <!-- 景點卡片 1：國立臺灣科學教育館 -->
+                <div class="card">
+                    <div class="card-header-row">
+                        <span class="category-tag cat-spot">景點</span>
+                        <span class="highlight-badge badge-photo">營業時間公告</span>
+                    </div>
+                    <div class="card-title">國立臺灣科學教育館（士林科教館）</div>
+                    <div class="card-desc">結合科學、互動與美學的教育殿堂，幾何天空步道與常設展讓小朋友盡情探索。</div>
+                    
+                    <div class="info-box">
+                        <i class="fa-solid fa-clock"></i>
+                        <div><strong>營業時間：</strong><br>
+                        • 週二至週五（非寒暑假）：09:00 - 17:00（16:00 最後入場）<br>
+                        • 週六、日、國定假日及寒暑假：09:00 - 18:00（17:00 最後入場）<br>
+                        • <strong>休館日：</strong>每週一休館（國定假日除外）。</div>
+                    </div>
+                    <div class="info-box photo-tip-box">
+                        <i class="fa-solid fa-camera"></i>
+                        <div><strong>拍照小技巧：</strong>站在 3D 巨型幾何手扶梯交錯處向上仰拍，張力十足。</div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="https://maps.google.com/?q=國立臺灣科學教育館" target="_blank" class="action-btn map-btn">
+                            <i class="fa-solid fa-location-dot"></i> Google 導航
+                        </a>
+                        <label class="action-btn upload-btn">
+                            <i class="fa-solid fa-image"></i> 上傳旅記
+                            <input type="file" accept="image/*" onchange="handleImageUpload(event, this)" style="display:none;">
+                        </label>
+                    </div>
+                    <div class="photo-preview-container"></div>
+                </div>
+
+                <!-- 景點卡片 2：臺北市立天文科學教育館 -->
+                <div class="card">
+                    <div class="card-header-row">
+                        <span class="category-tag cat-spot">景點</span>
+                        <span class="highlight-badge badge-photo">營業時間公告</span>
+                    </div>
+                    <div class="card-title">臺北市立天文科學教育館</div>
+                    <div class="card-desc">帶領孩子探索浩瀚宇宙的奧秘，擁有精采的宇宙劇場、立體劇場與宇宙探險軌道車。</div>
+                    
+                    <div class="info-box">
+                        <i class="fa-solid fa-clock"></i>
+                        <div><strong>營業時間：</strong><br>
+                        • 展示場：09:00 - 17:00（週六延長至 20:00）<br>
+                        • 劇場/探險：09:00/09:30 - 16:00（週六特定場次延長）<br>
+                        • <strong>休館日：</strong>每週一休館。</div>
+                    </div>
+                    <div class="info-box photo-tip-box">
+                        <i class="fa-solid fa-camera"></i>
+                        <div><strong>拍照小技巧：</strong>在宇宙展示場的巨型星球模型前合影，拍出漫步太空的奇幻感。</div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="https://maps.google.com/?q=臺北市立天文科學教育館" target="_blank" class="action-btn map-btn">
+                            <i class="fa-solid fa-location-dot"></i> Google 導航
+                        </a>
+                        <label class="action-btn upload-btn">
+                            <i class="fa-solid fa-image"></i> 上傳旅記
+                            <input type="file" accept="image/*" onchange="handleImageUpload(event, this)" style="display:none;">
+                        </label>
+                    </div>
+                    <div class="photo-preview-container"></div>
+                </div>
+
+                <!-- 景點卡片 3：北投徒步泡腳/泡湯 -->
+                <div class="card">
+                    <div class="card-header-row">
+                        <span class="category-tag cat-act">活動/景點</span>
+                        <span class="highlight-badge badge-eat">徒步漫遊·溫泉舒壓</span>
+                    </div>
+                    <div class="card-title">北投徒步漫遊：復興公園足湯與地熱谷</div>
+                    <div class="card-desc">搭乘捷運至「新北投站」下車，全區徒步可達！推薦至<strong>「復興公園免費青磺泉泡腳池」</strong>（08:00–18:00，周一休）舒緩鐵腿，再漫步至<strong>「地熱谷」</strong>欣賞硫磺煙霧。附近也有多間平價湯屋可自由選擇。</div>
+                    
+                    <div class="info-box">
+                        <i class="fa-solid fa-train-subway"></i>
+                        <div><strong>交通方式：</strong>自士林/劍潭站搭乘捷運至「北投站」轉乘新北投線至「新北投站」，出站步行 5 分鐘即可抵達復興公園。</div>
+                    </div>
+                    <div class="info-box photo-tip-box">
+                        <i class="fa-solid fa-camera"></i>
+                        <div><strong>拍照小技巧：</strong>地熱谷湖面飄散著迷濛的白色蒸氣，以藍綠色溫泉水當背景能拍出仙氣飄飄的美照。</div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="https://maps.google.com/?q=復興公園泡腳池" target="_blank" class="action-btn map-btn">
+                            <i class="fa-solid fa-location-dot"></i> Google 導航
+                        </a>
+                        <label class="action-btn upload-btn">
+                            <i class="fa-solid fa-image"></i> 上傳旅記
+                            <input type="file" accept="image/*" onchange="handleImageUpload(event, this)" style="display:none;">
+                        </label>
+                    </div>
+                    <div class="photo-preview-container"></div>
+                </div>
+
+                <!-- 景點卡片 4：士林夜市與延三夜市 (雙夜市) -->
+                <div class="card">
+                    <div class="card-header-row">
+                        <span class="category-tag cat-food">食物</span>
+                        <span class="highlight-badge badge-eat">雙夜市連線</span>
+                    </div>
+                    <div class="card-title">士林夜市 & 延三夜市 (雙夜市美食巡禮)</div>
+                    <div class="card-desc">傍晚先至熱鬧的<strong>士林夜市</strong>品嚐大雞排、蚵仔煎；隨後返回住宿點（大橋頭站）樓下的<strong>延三夜市</strong>，品嚐米其林推薦的道地古早味宵夜（筒仔米糕、肉羹）。</div>
+                    
+                    <div class="info-box">
+                        <i class="fa-solid fa-train-subway"></i>
+                        <div><strong>捷運資訊：</strong>士林夜市近劍潭站；延三夜市緊鄰 Day 1 住宿「拾光行旅」（大橋頭站 1 號出口旁）。</div>
+                    </div>
+                    <div class="info-box photo-tip-box">
+                        <i class="fa-solid fa-camera"></i>
+                        <div><strong>拍照小技巧：</strong>拍攝延三夜市老牌攤販招牌與熱騰騰的小吃，充滿濃濃的人情台味。</div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="https://maps.google.com/?q=延三夜市" target="_blank" class="action-btn map-btn">
+                            <i class="fa-solid fa-location-dot"></i> Google 導航
+                        </a>
+                        <label class="action-btn upload-btn">
+                            <i class="fa-solid fa-image"></i> 上傳旅記
+                            <input type="file" accept="image/*" onchange="handleImageUpload(event, this)" style="display:none;">
+                        </label>
+                    </div>
+                    <div class="photo-preview-container"></div>
+                </div>
+
+                <!-- 每日天氣提示 -->
+                <div class="weather-prompt-banner">
+                    <i class="fa-solid fa-cloud-sun"></i>
+                    <span><strong>Day 2 天氣提示：</strong>晴時多雲，北投泡腳與戶外步行請適時補充水分，晚間逛雙夜市舒適。</span>
+                </div>
+            </div>
+
+            <!-- ================= DAY 3 (大稻埕自由行 + 回程時間軸) ================= -->
+            <div id="section-day3" class="day-section">
+                <div class="daily-meta-card">
+                    <div class="daily-meta-info">
+                        <h2>DAY 3 · 大稻埕親子自由行與賦歸</h2>
+                        <p>📍 地點：大稻埕遊客中心 ➔ 迪化街 ➔ 潭子</p>
+                    </div>
+                    <div class="daily-meta-icon">
+                        <i class="fa-solid fa-umbrella-beach"></i>
+                    </div>
+                </div>
+
+                <!-- 景點卡片 1：大稻埕遊客中心 -->
+                <div class="card">
+                    <div class="card-header-row">
+                        <span class="category-tag cat-spot">景點</span>
+                        <span class="highlight-badge badge-photo">親子必玩·免費換裝</span>
+                    </div>
+                    <div class="card-title">大稻埕遊客中心（復古裝扮體驗）</div>
+                    <div class="card-desc">提供免費的日治時期復古服飾（洋裝、西服、學生服）租借體驗，並設有多處復古情境拍照區，全家大小一起穿越時空！</div>
+                    
+                    <div class="info-box">
+                        <i class="fa-solid fa-train-subway"></i>
+                        <div><strong>捷運資訊：</strong>捷運「北門站」3號出口或「大橋頭站」步行約 10 分鐘。</div>
+                    </div>
+                    <div class="info-box photo-tip-box">
+                        <i class="fa-solid fa-camera"></i>
+                        <div><strong>拍照小技巧：</strong>在館內復古照相館或老街景布景前，搭配懷舊服飾，能拍出極具質感的全家福寫真。</div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="https://maps.google.com/?q=大稻埕遊客中心" target="_blank" class="action-btn map-btn">
+                            <i class="fa-solid fa-location-dot"></i> Google 導航
+                        </a>
+                        <label class="action-btn upload-btn">
+                            <i class="fa-solid fa-image"></i> 上傳旅記
+                            <input type="file" accept="image/*" onchange="handleImageUpload(event, this)" style="display:none;">
+                        </label>
+                    </div>
+                    <div class="photo-preview-container"></div>
+                </div>
+
+                <!-- 景點卡片 2：迪化街老街 -->
+                <div class="card">
+                    <div class="card-header-row">
+                        <span class="category-tag cat-shopping">購物/食物</span>
+                        <span class="highlight-badge badge-eat">必吃必買</span>
+                    </div>
+                    <div class="card-title">迪化街老街與永樂市場</div>
+                    <div class="card-desc">漫步於巴洛克式紅磚老街，品嚐在地古早味點心，採買精緻伴手禮。</div>
+                    
+                    <div class="info-box">
+                        <i class="fa-solid fa-train-subway"></i>
+                        <div><strong>捷運資訊：</strong>位於迪化街一段，自大稻埕遊客中心步行即達。</div>
+                    </div>
+                    <div class="info-box photo-tip-box">
+                        <i class="fa-solid fa-camera"></i>
+                        <div><strong>拍照小技巧：</strong>捕捉老洋樓牌樓上的精美雕花與中藥行木櫃，充滿濃厚的人文風情。</div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="https://maps.google.com/?q=迪化街一段" target="_blank" class="action-btn map-btn">
+                            <i class="fa-solid fa-location-dot"></i> Google 導航
+                        </a>
+                        <label class="action-btn upload-btn">
+                            <i class="fa-solid fa-image"></i> 上傳旅記
+                            <input type="file" accept="image/*" onchange="handleImageUpload(event, this)" style="display:none;">
+                        </label>
+                    </div>
+                    <div class="photo-preview-container"></div>
+                </div>
+
+                <!-- 景點卡片 3：大稻埕碼頭貨櫃市集 -->
+                <div class="card">
+                    <div class="card-header-row">
+                        <span class="category-tag cat-spot">景點</span>
+                        <span class="highlight-badge badge-photo">河岸夕陽·親子放電</span>
+                    </div>
+                    <div class="card-title">大稻埕碼頭貨櫃市集 & 河濱自行車道</div>
+                    <div class="card-desc">位於5號水門內的河岸秘境，小朋友可在河濱草地跑跳、看船隻，傍晚欣賞絕美淡水河夕陽。</div>
+                    
+                    <div class="info-box">
+                        <i class="fa-solid fa-train-subway"></i>
+                        <div><strong>捷運資訊：</strong>自民生西路底直走穿越 5 號水門即達。</div>
+                    </div>
+                    <div class="info-box photo-tip-box">
+                        <i class="fa-solid fa-camera"></i>
+                        <div><strong>拍照小技巧：</strong>傍晚夕陽西下時，以河面波光與貨櫃市集的彩色燈串作為背景，剪影效果極佳。</div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="https://maps.google.com/?q=大稻埕碼頭貨櫃市集" target="_blank" class="action-btn map-btn">
+                            <i class="fa-solid fa-location-dot"></i> Google 導航
+                        </a>
+                        <label class="action-btn upload-btn">
+                            <i class="fa-solid fa-image"></i> 上傳旅記
+                            <input type="file" accept="image/*" onchange="handleImageUpload(event, this)" style="display:none;">
+                        </label>
+                    </div>
+                    <div class="photo-preview-container"></div>
+                </div>
+
+                <!-- 回程時間軸卡片 -->
+                <div class="timeline-card">
+                    <div class="timeline-title">
+                        <i class="fa-solid fa-clock"></i> <span>回程鐵道時刻軸</span>
+                    </div>
+                    <div class="timeline-list">
+                        <div class="timeline-node">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time-badge">16:45 - 18:14</div>
+                            <div class="timeline-text">搭乘普悠瑪 <strong>273班次</strong>（台北 16:45 發車 ➔ 豐原 18:14 抵達）。</div>
+                        </div>
+                        <div class="timeline-node">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-time-badge">18:23 - 18:29</div>
+                            <div class="timeline-text">於豐原站轉乘區間車 <strong>2223班次</strong>（豐原 18:23 發車 ➔ 潭子 18:29 抵達），平安溫馨賦歸！</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 每日天氣提示 -->
+                <div class="weather-prompt-banner">
+                    <i class="fa-solid fa-cloud"></i>
+                    <span><strong>Day 3 天氣提示：</strong>陰時多雲，氣溫舒適宜人，下午適合在大稻埕河岸吹風散策。</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 2. 指南頁籤 -->
+        <div id="tab-guide" class="tab-pane">
+            <div class="card">
+                <span class="category-tag cat-spot">交通指南</span>
+                <div class="card-title">鐵道與捷運轉乘建議</div>
+                <div class="card-desc">去回程皆已精算台鐵轉普悠瑪最佳銜接班次。市區移動全面依賴台北捷運（建議攜帶悠遊卡，暢行無阻）。</div>
+            </div>
+            <div class="card">
+                <span class="category-tag cat-act">親子貼心提醒</span>
+                <div class="card-title">大稻埕與北投泡腳須知</div>
+                <div class="card-desc">大稻埕遊客中心免費換裝建議提早前往；北投泡腳記得攜帶小毛巾擦拭雙腳，步行更輕鬆。</div>
+            </div>
+        </div>
+
+        <!-- 3. 天氣頁籤 -->
+        <div id="tab-weather" class="tab-pane">
+            <div class="weather-banner">
+                <div class="weather-info">
+                    <h3>台北市 · 晴時多雲</h3>
+                    <p>平均氣溫：22°C - 28°C / 降雨機率：20%</p>
+                </div>
+                <i class="fa-solid fa-sun weather-icon"></i>
+            </div>
+            <div class="card">
+                <span class="category-tag cat-spot">貼心建議</span>
+                <div class="card-title">三日穿搭與裝備清單</div>
+                <div class="card-desc">秋初台北早晚微涼，建議採洋蔥式穿搭。戶外行程務必攜帶防曬用品與輕便雨具，確保旅程舒適。</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 底部浮動導覽列 -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('itinerary', this)">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>行程</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('guide', this)">
+            <i class="fa-solid fa-book-open"></i>
+            <span>指南</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('weather', this)">
+            <i class="fa-solid fa-cloud-sun-rain"></i>
+            <span>天氣</span>
+        </button>
+    </nav>
+</div>
+
+<script>
+    // 主頁籤切換 (行程 / 指南 / 天氣)
+    function switchTab(tabId, element) {
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+        document.getElementById('tab-' + tabId).classList.add('active');
+        element.classList.add('active');
+    }
+
+    // 每日行程切換 (Day 1 / Day 2 / Day 3)
+    function switchDay(dayId, element) {
+        document.querySelectorAll('.day-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('active'));
+
+        document.getElementById('section-' + dayId).classList.add('active');
+        element.classList.add('active');
+    }
+
+    // 旅記相片上傳預覽互動功能
+    function handleImageUpload(event, input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const card = input.closest('.card');
+            const previewContainer = card.querySelector('.photo-preview-container');
+            
+            previewContainer.innerHTML = `<img src="${e.target.result}" alt="旅記照片">`;
+            previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
+
+</body>
+</html>
